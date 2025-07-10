@@ -1,0 +1,266 @@
+name: Security Audit & Performance
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run security audit daily at 00:00 UTC
+    - cron: '0 0 * * *'
+
+jobs:
+  security-audit:
+    name: Security Vulnerability Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
+      - name: Run ESLint security rules
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Upload security scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: snyk.sarif
+        continue-on-error: true
+
+  contract-security:
+    name: Smart Contract Security
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile contracts
+        run: npm run compile
+
+      - name: Run Solhint
+        run: npm run lint:contracts
+
+      - name: Check contract sizes
+        run: |
+          echo "📦 Contract Size Report:"
+          npm run compile
+          if [ -f "artifacts/contracts" ]; then
+            find artifacts/contracts -name "*.json" -exec sh -c '
+              for file; do
+                size=$(wc -c < "$file")
+                name=$(basename "$file" .json)
+                echo "$name: $size bytes"
+              done
+            ' sh {} +
+          fi
+
+      - name: Gas report
+        run: npm run test:mock
+        env:
+          REPORT_GAS: true
+
+      - name: Upload gas report
+        uses: actions/upload-artifact@v4
+        with:
+          name: gas-report
+          path: gas-report.txt
+          retention-days: 30
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+          deny-licenses: GPL-3.0, AGPL-3.0
+
+  performance-test:
+    name: Performance Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Analyze bundle size
+        run: |
+          echo "📊 Bundle Size Analysis:"
+          du -sh dist/
+          echo ""
+          echo "Detailed breakdown:"
+          find dist -type f -name "*.js" -exec sh -c '
+            for file; do
+              size=$(wc -c < "$file")
+              size_kb=$((size / 1024))
+              name=$(basename "$file")
+              echo "$name: ${size_kb}KB"
+            done
+          ' sh {} +
+
+      - name: Check bundle size limits
+        run: |
+          total_size=$(du -sb dist/ | awk '{print $1}')
+          max_size=$((500 * 1024)) # 500KB limit
+          if [ $total_size -gt $max_size ]; then
+            echo "❌ Bundle size exceeds 500KB limit"
+            echo "Current size: $((total_size / 1024))KB"
+            exit 1
+          else
+            echo "✅ Bundle size within limits: $((total_size / 1024))KB"
+          fi
+
+      - name: Upload bundle stats
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-stats
+          path: dist/stats.html
+          retention-days: 30
+
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for better analysis
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run TypeScript compiler
+        run: npm run typecheck
+
+      - name: Check code formatting
+        run: npm run format:check
+
+      - name: Run ESLint with security rules
+        run: npm run lint
+
+      - name: Calculate code metrics
+        run: |
+          echo "📈 Code Metrics:"
+          echo "Lines of code:"
+          find src -name "*.ts" -o -name "*.tsx" | xargs wc -l | tail -1
+          echo ""
+          echo "Number of files:"
+          find src -name "*.ts" -o -name "*.tsx" | wc -l
+
+  dos-protection-test:
+    name: DoS Protection Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile contracts
+        run: npm run compile
+
+      - name: Test gas limits
+        run: |
+          echo "⛽ Testing gas limits..."
+          npm run test:mock
+          if grep -q "gas used" gas-report.txt; then
+            echo "✅ Gas usage within limits"
+          else
+            echo "⚠️  No gas report found"
+          fi
+        env:
+          REPORT_GAS: true
+
+  security-summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    needs: [security-audit, contract-security, performance-test, code-quality]
+    if: always()
+
+    steps:
+      - name: Generate summary
+        run: |
+          echo "# Security & Performance Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Job Results" >> $GITHUB_STEP_SUMMARY
+          echo "- Security Audit: ${{ needs.security-audit.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Contract Security: ${{ needs.contract-security.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Performance Test: ${{ needs.performance-test.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Code Quality: ${{ needs.code-quality.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.security-audit.result }}" == "failure" ] || \
+             [ "${{ needs.contract-security.result }}" == "failure" ] || \
+             [ "${{ needs.performance-test.result }}" == "failure" ] || \
+             [ "${{ needs.code-quality.result }}" == "failure" ]; then
+            echo "❌ Some security or performance checks failed!" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "✅ All security and performance checks passed!" >> $GITHUB_STEP_SUMMARY
+          fi

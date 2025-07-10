@@ -1,0 +1,46 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit hooks..."
+
+# Run linters
+echo "📝 Running ESLint..."
+npm run lint || {
+  echo "❌ ESLint failed. Please fix the errors before committing."
+  exit 1
+}
+
+# Run Solidity linter
+echo "🔐 Running Solhint..."
+npm run lint:contracts || {
+  echo "⚠️  Solhint warnings detected. Please review."
+}
+
+# Check code formatting
+echo "✨ Checking code formatting..."
+npm run format:check || {
+  echo "❌ Code formatting issues detected. Run 'npm run format' to fix."
+  exit 1
+}
+
+# Run TypeScript type checking
+echo "🔍 Running TypeScript type checking..."
+npm run typecheck || {
+  echo "❌ TypeScript type errors detected. Please fix before committing."
+  exit 1
+}
+
+# Run unit tests
+echo "🧪 Running tests..."
+npm run test:mock || {
+  echo "❌ Tests failed. Please fix before committing."
+  exit 1
+}
+
+# Security audit (non-blocking)
+echo "🔒 Running security audit..."
+npm audit --audit-level=high || {
+  echo "⚠️  Security vulnerabilities detected. Please review."
+}
+
+echo "✅ All pre-commit checks passed!"

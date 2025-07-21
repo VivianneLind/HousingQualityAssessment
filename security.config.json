@@ -1,0 +1,84 @@
+{
+  "security": {
+    "audit": {
+      "enabled": true,
+      "level": "moderate",
+      "exclude": [],
+      "autoFix": false
+    },
+    "dos_protection": {
+      "rate_limiting": {
+        "enabled": true,
+        "max_requests_per_minute": 60,
+        "block_duration_minutes": 15
+      },
+      "gas_limits": {
+        "max_gas_per_transaction": 8000000,
+        "max_gas_price_gwei": 500
+      },
+      "input_validation": {
+        "max_string_length": 256,
+        "max_array_length": 100,
+        "sanitize_inputs": true
+      }
+    },
+    "smart_contract": {
+      "reentrancy_guard": true,
+      "overflow_protection": true,
+      "access_control": true,
+      "pausable": false,
+      "upgrade_pattern": "none"
+    },
+    "frontend": {
+      "csp_policy": {
+        "default_src": ["'self'"],
+        "script_src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        "style_src": ["'self'", "'unsafe-inline'"],
+        "img_src": ["'self'", "data:", "https:"],
+        "connect_src": ["'self'", "https://sepolia.infura.io", "https://api.etherscan.io"]
+      },
+      "security_headers": {
+        "x_content_type_options": "nosniff",
+        "x_frame_options": "DENY",
+        "x_xss_protection": "1; mode=block",
+        "referrer_policy": "strict-origin-when-cross-origin"
+      }
+    }
+  },
+  "performance": {
+    "optimization": {
+      "code_splitting": true,
+      "tree_shaking": true,
+      "minification": true,
+      "compression": "gzip"
+    },
+    "caching": {
+      "service_worker": false,
+      "static_assets": true,
+      "api_responses": false
+    },
+    "monitoring": {
+      "gas_reporter": true,
+      "bundle_analyzer": true,
+      "lighthouse_ci": false
+    },
+    "thresholds": {
+      "max_bundle_size_kb": 500,
+      "max_initial_load_time_ms": 3000,
+      "max_gas_per_function": 1000000
+    }
+  },
+  "compiler_optimization": {
+    "solidity": {
+      "optimizer_enabled": true,
+      "optimizer_runs": 200,
+      "via_ir": false,
+      "yul_optimization": true
+    },
+    "typescript": {
+      "strict": true,
+      "skip_lib_check": true,
+      "es_module_interop": true
+    }
+  }
+}

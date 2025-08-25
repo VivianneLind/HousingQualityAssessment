@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["vite/client"]
+  },
+  "include": ["src"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "scripts",
+    "test",
+    "hardhat.config.cts",
+    "tsconfig.hardhat.json",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
+}

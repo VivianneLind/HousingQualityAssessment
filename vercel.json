@@ -1,9 +1,10 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "vite build",
   "outputDirectory": "dist",
-  "framework": "vite",
-  "installCommand": "npm install",
+  "framework": null,
+  "installCommand": "npm install --legacy-peer-deps",
   "devCommand": "npm run dev",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./src ./public",
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [

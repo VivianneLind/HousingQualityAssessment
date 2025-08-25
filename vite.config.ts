@@ -5,6 +5,11 @@ import { visualizer } from 'rollup-plugin-visualizer'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Use dedicated TypeScript config for Vite
+  // This prevents conflicts with Hardhat types
+  define: {
+    'process.env.VITE_BUILD': '"true"'
+  },
   plugins: [
     react({
       // React Fast Refresh optimization

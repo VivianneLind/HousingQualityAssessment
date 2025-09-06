@@ -1,10 +1,10 @@
 {
-  "buildCommand": "vite build",
+  "version": 2,
+  "buildCommand": "npx vite build",
   "outputDirectory": "dist",
-  "framework": null,
-  "installCommand": "npm install --legacy-peer-deps",
+  "installCommand": "npm install --legacy-peer-deps --ignore-scripts",
   "devCommand": "npm run dev",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./src ./public",
+  "framework": null,
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
@@ -37,15 +37,8 @@
         {
           "key": "X-XSS-Protection",
           "value": "1; mode=block"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
         }
       ]
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }

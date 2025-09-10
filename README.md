@@ -3,6 +3,7 @@
 > Privacy-preserving housing quality assessment system built on **Zama FHEVM** - enabling encrypted property evaluations on blockchain
 
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-View_App-blue?style=for-the-badge)](https://YOUR_USERNAME.github.io/privacy-housing-assessment)
+[![Video Demo: demo.mp4]]
 [![Sepolia Contract](https://img.shields.io/badge/📜_Contract-Sepolia_Testnet-green?style=for-the-badge)](https://sepolia.etherscan.io/address/0x2Bb93Efbb0B73042494D228e5b5Ca0e0705d3640)
 
 [![codecov](https://codecov.io/gh/YOUR_USERNAME/YOUR_REPO/branch/main/graph/badge.svg)](https://codecov.io/gh/YOUR_USERNAME/YOUR_REPO)

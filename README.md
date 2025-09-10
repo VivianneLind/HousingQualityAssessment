@@ -5,8 +5,6 @@
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-View_App-blue?style=for-the-badge)](https://YOUR_USERNAME.github.io/privacy-housing-assessment)
 [![Sepolia Contract](https://img.shields.io/badge/📜_Contract-Sepolia_Testnet-green?style=for-the-badge)](https://sepolia.etherscan.io/address/0x2Bb93Efbb0B73042494D228e5b5Ca0e0705d3640)
 
-[![Test Suite](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/test.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/test.yml)
-[![Security](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/security.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/security.yml)
 [![codecov](https://codecov.io/gh/YOUR_USERNAME/YOUR_REPO/branch/main/graph/badge.svg)](https://codecov.io/gh/YOUR_USERNAME/YOUR_REPO)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -413,7 +411,7 @@ For detailed testing documentation, see [TESTING.md](./TESTING.md).
 
 ### Deployed Application
 
-🔗 **Frontend**: [https://YOUR_USERNAME.github.io/privacy-housing-assessment](https://YOUR_USERNAME.github.io/privacy-housing-assessment)
+🔗 **Frontend**: [https://housing-quality-assessment.vercel.app/](https://housing-quality-assessment.vercel.app/)
 
 ### Sepolia Testnet Contract
 
@@ -775,7 +773,7 @@ We welcome contributions! Please follow these steps:
 
 ```bash
 # Fork the repository
-git clone https://github.com/YOUR_USERNAME/privacy-housing-assessment.git
+git clone https://github.com/VivianneLind/HousingQualityAssessment.git
 
 # Create feature branch
 git checkout -b feature/amazing-feature
@@ -876,7 +874,7 @@ Solution:
 5. Retry commit
 ```
 
-For more issues, see [GitHub Issues](https://github.com/YOUR_USERNAME/YOUR_REPO/issues).
+For more issues, see [GitHub Issues](https://github.com/VivianneLind/HousingQualityAssessment/issues).
 
 ---
 
@@ -953,7 +951,7 @@ in the Software without restriction...
 - **Email**: contact@example.com
 - **Twitter**: [@PrivacyHousing](https://twitter.com/PrivacyHousing)
 - **Discord**: [Join our community](https://discord.gg/your-invite)
-- **GitHub**: [Report Issues](https://github.com/YOUR_USERNAME/YOUR_REPO/issues)
+- **GitHub**: [Report Issues](https://github.com/VivianneLind/HousingQualityAssessment/issues)
 
 ---
 
@@ -963,6 +961,6 @@ in the Software without restriction...
 
 Made with ❤️ by the Privacy Housing Assessment Team
 
-[Live Demo](https://YOUR_USERNAME.github.io/privacy-housing-assessment) • [Documentation](./QUICK_START.md) • [Report Bug](https://github.com/YOUR_USERNAME/YOUR_REPO/issues) • [Request Feature](https://github.com/YOUR_USERNAME/YOUR_REPO/issues)
+[Live Demo](https://housing-quality-assessment.vercel.app/) • [Documentation](./QUICK_START.md) • [Report Bug](https://github.com/VivianneLind/HousingQualityAssessment) • [Request Feature](https://github.com/VivianneLind/HousingQualityAssessment/issues)
 
 </div>

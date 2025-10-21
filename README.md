@@ -2,8 +2,8 @@
 
 > Privacy-preserving housing quality assessment system built on **Zama FHEVM** - enabling encrypted property evaluations on blockchain
 
-[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-View_App-blue?style=for-the-badge)](https://YOUR_USERNAME.github.io/privacy-housing-assessment)
-[![Video Demo: demo.mp4]]
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-View_App-blue?style=for-the-badge)](https://housing-quality-assessment.vercel.app/)
+
 [![Sepolia Contract](https://img.shields.io/badge/📜_Contract-Sepolia_Testnet-green?style=for-the-badge)](https://sepolia.etherscan.io/address/0x2Bb93Efbb0B73042494D228e5b5Ca0e0705d3640)
 
 [![codecov](https://codecov.io/gh/YOUR_USERNAME/YOUR_REPO/branch/main/graph/badge.svg)](https://codecov.io/gh/YOUR_USERNAME/YOUR_REPO)
@@ -11,7 +11,44 @@
 
 ---
 
+## 🎥 Video Demo
+
+**📹 Download and Watch Full Demo: [`demo.mp4`]**
+
+The video demonstration includes:
+- ✅ **Project Introduction** - Privacy-preserving housing quality assessment system overview
+- ✅ **Technical Architecture** - FHEVM encryption technology and smart contract design
+- ✅ **Complete Workflow** - From assessor registration to encrypted assessment submission
+- ✅ **Live Demonstration** - Real interactions on Sepolia testnet
+- ✅ **Core Features** - Encrypted scoring, homomorphic computation, permission management
+
+**Note**: The video file `demo.mp4` is located in the project root directory. Please download it to watch the complete demonstration.
+
+---
+
 **Built for the Zama FHE Challenge** - Demonstrating privacy-preserving property assessment using Fully Homomorphic Encryption (FHE) on Ethereum blockchain.
+
+---
+
+## 📚 Table of Contents
+
+- [🎥 Video Demo](#-video-demo)
+- [🎯 What is This?](#-what-is-this)
+- [✨ Features](#-features)
+- [🏗️ Architecture](#️-architecture)
+- [🔐 Privacy Model](#-privacy-model)
+- [🚀 Quick Start](#-quick-start)
+- [📋 Usage Guide](#-usage-guide)
+- [🔧 Technical Implementation](#-technical-implementation)
+- [🧪 Testing](#-testing)
+- [🌐 Live Demo](#-live-demo)
+- [📦 Deployment](#-deployment)
+- [🎓 Documentation](#-documentation)
+- [🛣️ Roadmap](#️-roadmap)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+
+---
 
 ## 🎯 What is This?
 
@@ -132,7 +169,7 @@ Sepolia testnet ETH (get from https://sepoliafaucet.com/)
 
 ```bash
 # Clone repository
-git clone https://github.com/YOUR_USERNAME/privacy-housing-assessment.git
+git clone https://github.com/VivianneLind/HousingQualityAssessment.git
 cd privacy-housing-assessment
 
 # Install dependencies

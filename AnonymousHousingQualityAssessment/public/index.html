@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonymous Housing Quality Assessment</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .main-title {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card h2 {
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .status.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .score-input {
+            max-width: 120px;
+        }
+
+        .score-description {
+            font-size: 0.875rem;
+            color: #718096;
+            margin-top: 0.25rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+        }
+
+        .wallet-info {
+            background: linear-gradient(135deg, #ebf8ff, #bee3f8);
+            border: 1px solid #90cdf4;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .assessor-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-item {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-item strong {
+            color: #2d3748;
+        }
+
+        .report-card {
+            background: linear-gradient(135deg, #f0fff4, #c6f6d5);
+            border: 1px solid #9ae6b4;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .report-score {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #38a169;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .issue-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .issue-item {
+            padding: 0.75rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .issue-yes {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .issue-no {
+            background: #c6f6d5;
+            color: #276749;
+            border: 1px solid #9ae6b4;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #fef5e7, #fed7aa);
+            border: 1px solid #f6ad55;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #c05621;
+        }
+
+        .stat-label {
+            color: #744210;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .main-title {
+                font-size: 2rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                🏠 Housing Quality Assessment
+            </div>
+            <div id="networkInfo"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="main-title">Anonymous Housing Quality Assessment System</h1>
+
+        <div id="status" class="status info">Connect your wallet to get started</div>
+
+        <!-- Wallet Connection -->
+        <div class="card">
+            <h2>🔗 Wallet Connection</h2>
+            <button id="connectWallet" class="btn">Connect MetaMask</button>
+            <div id="walletInfo"></div>
+        </div>
+
+        <!-- Assessor Management -->
+        <div class="card">
+            <h2>👤 Assessor Registration</h2>
+            <div style="margin-bottom: 1rem;">
+                <button id="registerAssessor" class="btn">Register as Assessor</button>
+                <button id="checkAssessorStatus" class="btn btn-secondary">Check My Status</button>
+            </div>
+            <div id="assessorInfo"></div>
+        </div>
+
+        <!-- Submit Assessment -->
+        <div class="card">
+            <h2>🏗️ Submit Quality Assessment</h2>
+            <div class="form-group">
+                <label for="propertyId">Property Identifier:</label>
+                <input type="text" id="propertyId" placeholder="Enter property identifier (e.g., PROP-2024-001)">
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="structuralScore">Structural Score (0-100):</label>
+                    <input type="number" id="structuralScore" class="score-input" min="0" max="100" value="85">
+                    <div class="score-description">Foundation, walls, roof integrity</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="safetyScore">Safety Score (0-100):</label>
+                    <input type="number" id="safetyScore" class="score-input" min="0" max="100" value="90">
+                    <div class="score-description">Fire safety, electrical, emergency exits</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="utilityScore">Utility Score (0-100):</label>
+                    <input type="number" id="utilityScore" class="score-input" min="0" max="100" value="75">
+                    <div class="score-description">Plumbing, heating, electrical systems</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="locationScore">Location Score (0-100):</label>
+                    <input type="number" id="locationScore" class="score-input" min="0" max="100" value="80">
+                    <div class="score-description">Neighborhood, access, environment</div>
+                </div>
+            </div>
+
+            <button id="submitAssessment" class="btn">Submit Assessment</button>
+        </div>
+
+        <!-- Verify Assessments -->
+        <div class="card">
+            <h2>✅ Verify Assessments (Owner Only)</h2>
+            <div class="form-group">
+                <label for="verifyAssessmentId">Assessment ID:</label>
+                <input type="number" id="verifyAssessmentId" min="1" placeholder="Enter assessment ID to verify">
+            </div>
+            <button id="verifyAssessment" class="btn">Verify Assessment</button>
+        </div>
+
+        <!-- Quality Reports -->
+        <div class="card">
+            <h2>📊 Quality Reports</h2>
+            <div class="form-group">
+                <label for="reportAssessmentId">Assessment ID:</label>
+                <input type="number" id="reportAssessmentId" min="1" placeholder="Enter assessment ID for report">
+            </div>
+            <button id="getQualityReport" class="btn btn-secondary">Get Quality Report</button>
+            <div id="qualityReportResult"></div>
+        </div>
+
+        <!-- Property History -->
+        <div class="card">
+            <h2>🏘️ Property History</h2>
+            <div class="form-group">
+                <label for="historyPropertyId">Property ID:</label>
+                <input type="text" id="historyPropertyId" placeholder="Enter property ID">
+            </div>
+            <button id="getPropertyHistory" class="btn btn-secondary">Get Property Assessment History</button>
+            <div id="propertyHistoryResult"></div>
+        </div>
+
+        <!-- System Statistics -->
+        <div class="card">
+            <h2>📈 System Statistics</h2>
+            <button id="getSystemStats" class="btn btn-secondary">Get System Statistics</button>
+            <div id="systemStatsResult"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Anonymous Housing Quality Assessment System - Powered by FHEVM & Zama</p>
+        <p>Ensuring privacy-preserving property evaluations on the blockchain</p>
+    </div>
+
+    <script>
+        // Check if ethers is loaded, if not, try to load fallback
+        if (typeof ethers === 'undefined') {
+            console.error('Ethers.js failed to load from primary CDN, trying fallback...');
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js';
+            script.onload = function() {
+                console.log('Ethers.js loaded from fallback CDN');
+                initializeApp();
+            };
+            script.onerror = function() {
+                document.getElementById('status').innerHTML = '<div class="status error">Failed to load required libraries. Please check your internet connection and refresh the page.</div>';
+            };
+            document.head.appendChild(script);
+        } else {
+            console.log('Ethers.js loaded successfully');
+            initializeApp();
+        }
+
+        function initializeApp() {
+            // Contract configuration - Update this with your deployed contract address
+        const CONTRACT_ADDRESS = "0xE91BF284dD61830Df29b5968bD6D30d2A910B4D5"; // Replace with actual deployed address
+        const CONTRACT_ABI = [
+            "function registerAssessor() external",
+            "function certifyAssessor(address assessor) external",
+            "function submitQualityAssessment(uint32 _structuralScore, uint32 _safetyScore, uint32 _utilityScore, uint32 _locationScore, string memory _encryptedPropertyId) external",
+            "function verifyAssessment(uint32 assessmentId) external",
+            "function getAssessmentInfo(uint32 assessmentId) external view returns (address assessor, uint256 timestamp, bool isVerified, bool isCompleted, string memory encryptedPropertyId)",
+            "function getQualityReport(uint32 assessmentId) external view returns (uint32 publicOverallScore, bool hasStructuralIssues, bool hasSafetyIssues, bool hasUtilityIssues, uint256 reportTime)",
+            "function getAssessorStats(address assessor) external view returns (bool isRegistered, bool isCertified, uint256 totalAssessments, uint256 verifiedAssessments, uint256 registrationTime)",
+            "function getPropertyAssessmentCount(string memory encryptedPropertyId) external view returns (uint256)",
+            "function getPropertyAssessmentIds(string memory encryptedPropertyId) external view returns (uint32[] memory)",
+            "function getTotalAssessments() external view returns (uint32)",
+            "function owner() external view returns (address)",
+            "event AssessorRegistered(address indexed assessor, uint256 timestamp)",
+            "event AssessmentSubmitted(uint32 indexed assessmentId, address indexed assessor, uint256 timestamp)",
+            "event AssessmentVerified(uint32 indexed assessmentId, address indexed verifier)",
+            "event QualityReportGenerated(uint32 indexed assessmentId, uint32 publicScore)"
+        ];
+
+        let provider, signer, contract, userAddress, isOwner = false;
+
+        async function connectWallet() {
+            try {
+                if (typeof window.ethereum !== 'undefined') {
+                    // Request account access
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    signer = provider.getSigner();
+                    userAddress = await signer.getAddress();
+
+                    // Create contract instance
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+                    // Get network information
+                    const network = await provider.getNetwork();
+
+                    // Check if user is the contract owner
+                    try {
+                        const owner = await contract.owner();
+                        isOwner = userAddress.toLowerCase() === owner.toLowerCase();
+                    } catch (error) {
+                        console.log('Could not determine owner status');
+                    }
+
+                    // Update UI
+                    document.getElementById('walletInfo').innerHTML = `
+                        <div class="wallet-info">
+                            <div><strong>Connected Address:</strong> ${userAddress}</div>
+                            <div><strong>Network:</strong> ${network.name} (Chain ID: ${network.chainId})</div>
+                            ${isOwner ? '<div><strong>Status:</strong> Contract Owner</div>' : ''}
+                        </div>
+                    `;
+
+                    document.getElementById('networkInfo').innerHTML = `
+                        <div style="font-size: 0.9rem; color: #718096;">
+                            ${network.name} | ${userAddress.slice(0, 6)}...${userAddress.slice(-4)}
+                        </div>
+                    `;
+
+                    updateStatus('Wallet connected successfully!', 'success');
+                    await checkAssessorStatus();
+
+                    // Listen for account changes
+                    window.ethereum.on('accountsChanged', function (accounts) {
+                        if (accounts.length === 0) {
+                            updateStatus('Please connect to MetaMask', 'error');
+                        } else {
+                            window.location.reload();
+                        }
+                    });
+
+                    // Listen for network changes
+                    window.ethereum.on('chainChanged', function (networkId) {
+                        window.location.reload();
+                    });
+
+                } else {
+                    updateStatus('MetaMask not found. Please install MetaMask extension.', 'error');
+                }
+            } catch (error) {
+                updateStatus(`Connection failed: ${error.message}`, 'error');
+                console.error('Connection error:', error);
+            }
+        }
+
+        async function registerAssessor() {
+            if (!contract) {
+                updateStatus('Please connect your wallet first', 'error');
+                return;
+            }
+
+            try {
+                updateStatus('Registering assessor...', 'info');
+                const tx = await contract.registerAssessor();
+
+                updateStatus('Transaction submitted. Waiting for confirmation...', 'info');
+                await tx.wait();
+
+                updateStatus('Assessor registered successfully!', 'success');
+                await checkAssessorStatus();
+            } catch (error) {
+                updateStatus(`Registration failed: ${error.message}`, 'error');
+                console.error('Registration error:', error);
+            }
+        }
+
+        async function checkAssessorStatus() {
+            if (!contract || !userAddress) return;
+
+            try {
+                const stats = await contract.getAssessorStats(userAddress);
+
+                document.getElementById('assessorInfo').innerHTML = `
+                    <div class="assessor-info">
+                        <div class="info-item">
+                            <strong>Registered:</strong> ${stats.isRegistered ? '✅ Yes' : '❌ No'}
+                        </div>
+                        <div class="info-item">
+                            <strong>Certified:</strong> ${stats.isCertified ? '✅ Yes' : '❌ No'}
+                        </div>
+                        <div class="info-item">
+                            <strong>Total Assessments:</strong> ${stats.totalAssessments.toString()}
+                        </div>
+                        <div class="info-item">
+                            <strong>Verified Assessments:</strong> ${stats.verifiedAssessments.toString()}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error checking assessor status:', error);
+            }
+        }
+
+        async function submitAssessment() {
+            if (!contract) {
+                updateStatus('Please connect your wallet first', 'error');
+                return;
+            }
+
+            try {
+                const propertyId = document.getElementById('propertyId').value.trim();
+                const structural = parseInt(document.getElementById('structuralScore').value);
+                const safety = parseInt(document.getElementById('safetyScore').value);
+                const utility = parseInt(document.getElementById('utilityScore').value);
+                const location = parseInt(document.getElementById('locationScore').value);
+
+                // Validation
+                if (!propertyId) {
+                    updateStatus('Please enter a property ID', 'error');
+                    return;
+                }
+
+                if (isNaN(structural) || isNaN(safety) || isNaN(utility) || isNaN(location)) {
+                    updateStatus('Please enter valid scores for all categories', 'error');
+                    return;
+                }
+
+                if (structural < 0 || structural > 100 || safety < 0 || safety > 100 ||
+                    utility < 0 || utility > 100 || location < 0 || location > 100) {
+                    updateStatus('All scores must be between 0 and 100', 'error');
+                    return;
+                }
+
+                updateStatus('Submitting assessment...', 'info');
+                const tx = await contract.submitQualityAssessment(structural, safety, utility, location, propertyId);
+
+                updateStatus('Transaction submitted. Waiting for confirmation...', 'info');
+                await tx.wait();
+
+                updateStatus('Assessment submitted successfully!', 'success');
+
+                // Clear form
+                document.getElementById('propertyId').value = '';
+                document.getElementById('structuralScore').value = '85';
+                document.getElementById('safetyScore').value = '90';
+                document.getElementById('utilityScore').value = '75';
+                document.getElementById('locationScore').value = '80';
+
+                await checkAssessorStatus();
+            } catch (error) {
+                updateStatus(`Assessment submission failed: ${error.message}`, 'error');
+                console.error('Submission error:', error);
+            }
+        }
+
+        async function verifyAssessment() {
+            if (!contract) {
+                updateStatus('Please connect your wallet first', 'error');
+                return;
+            }
+
+            if (!isOwner) {
+                updateStatus('Only contract owner can verify assessments', 'error');
+                return;
+            }
+
+            try {
+                const assessmentId = parseInt(document.getElementById('verifyAssessmentId').value);
+
+                if (!assessmentId || assessmentId < 1) {
+                    updateStatus('Please enter a valid assessment ID', 'error');
+                    return;
+                }
+
+                updateStatus('Verifying assessment...', 'info');
+                const tx = await contract.verifyAssessment(assessmentId);
+
+                updateStatus('Transaction submitted. Waiting for confirmation...', 'info');
+                await tx.wait();
+
+                updateStatus('Assessment verified successfully!', 'success');
+                document.getElementById('verifyAssessmentId').value = '';
+            } catch (error) {
+                updateStatus(`Verification failed: ${error.message}`, 'error');
+                console.error('Verification error:', error);
+            }
+        }
+
+        async function getQualityReport() {
+            if (!contract) {
+                updateStatus('Please connect your wallet first', 'error');
+                return;
+            }
+
+            try {
+                const assessmentId = parseInt(document.getElementById('reportAssessmentId').value);
+
+                if (!assessmentId || assessmentId < 1) {
+                    updateStatus('Please enter a valid assessment ID', 'error');
+                    return;
+                }
+
+                updateStatus('Fetching quality report...', 'info');
+                const report = await contract.getQualityReport(assessmentId);
+
+                document.getElementById('qualityReportResult').innerHTML = `
+                    <div class="report-card">
+                        <h3>Quality Report for Assessment #${assessmentId}</h3>
+                        <div class="report-score">${report.publicOverallScore}/100</div>
+
+                        <div class="issue-grid">
+                            <div class="issue-item ${report.hasStructuralIssues ? 'issue-yes' : 'issue-no'}">
+                                Structural Issues: ${report.hasStructuralIssues ? 'Yes' : 'No'}
+                            </div>
+                            <div class="issue-item ${report.hasSafetyIssues ? 'issue-yes' : 'issue-no'}">
+                                Safety Issues: ${report.hasSafetyIssues ? 'Yes' : 'No'}
+                            </div>
+                            <div class="issue-item ${report.hasUtilityIssues ? 'issue-yes' : 'issue-no'}">
+                                Utility Issues: ${report.hasUtilityIssues ? 'Yes' : 'No'}
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 1rem; text-align: center; color: #718096;">
+                            <strong>Report Generated:</strong> ${new Date(report.reportTime * 1000).toLocaleString()}
+                        </div>
+                    </div>
+                `;
+
+                updateStatus('Quality report retrieved successfully!', 'success');
+            } catch (error) {
+                updateStatus(`Failed to get quality report: ${error.message}`, 'error');
+                console.error('Report error:', error);
+            }
+        }
+
+        async function getPropertyHistory() {
+            if (!contract) {
+                updateStatus('Please connect your wallet first', 'error');
+                return;
+            }
+
+            try {
+                const propertyId = document.getElementById('historyPropertyId').value.trim();
+
+                if (!propertyId) {
+                    updateStatus('Please enter a property ID', 'error');
+                    return;
+                }
+
+                updateStatus('Fetching property history...', 'info');
+                const count = await contract.getPropertyAssessmentCount(propertyId);
+                const assessmentIds = await contract.getPropertyAssessmentIds(propertyId);
+
+                document.getElementById('propertyHistoryResult').innerHTML = `
+                    <div class="report-card">
+                        <h3>Assessment History for Property: ${propertyId}</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-number">${count.toString()}</div>
+                                <div class="stat-label">Total Assessments</div>
+                            </div>
+                        </div>
+                        ${assessmentIds.length > 0 ? `
+                            <div style="margin-top: 1rem;">
+                                <strong>Assessment IDs:</strong> ${assessmentIds.map(id => `#${id}`).join(', ')}
+                            </div>
+                        ` : '<div style="margin-top: 1rem; color: #718096;">No assessments found for this property.</div>'}
+                    </div>
+                `;
+
+                updateStatus('Property history retrieved successfully!', 'success');
+            } catch (error) {
+                updateStatus(`Failed to get property history: ${error.message}`, 'error');
+                console.error('History error:', error);
+            }
+        }
+
+        async function getSystemStats() {
+            if (!contract) {
+                updateStatus('Please connect your wallet first', 'error');
+                return;
+            }
+
+            try {
+                updateStatus('Fetching system statistics...', 'info');
+                const totalAssessments = await contract.getTotalAssessments();
+                const owner = await contract.owner();
+
+                document.getElementById('systemStatsResult').innerHTML = `
+                    <div class="report-card">
+                        <h3>System Statistics</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-number">${totalAssessments.toString()}</div>
+                                <div class="stat-label">Total Assessments</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">Active</div>
+                                <div class="stat-label">System Status</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; text-align: center; color: #718096; font-size: 0.9rem;">
+                            <strong>Contract Owner:</strong> ${owner}
+                        </div>
+                    </div>
+                `;
+
+                updateStatus('System statistics retrieved successfully!', 'success');
+            } catch (error) {
+                updateStatus(`Failed to get system stats: ${error.message}`, 'error');
+                console.error('Stats error:', error);
+            }
+        }
+
+        function updateStatus(message, type) {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = message;
+            statusElement.className = `status ${type}`;
+
+            // Auto-clear success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusElement.textContent = 'Ready for next action';
+                    statusElement.className = 'status info';
+                }, 5000);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('connectWallet').addEventListener('click', connectWallet);
+        document.getElementById('registerAssessor').addEventListener('click', registerAssessor);
+        document.getElementById('checkAssessorStatus').addEventListener('click', checkAssessorStatus);
+        document.getElementById('submitAssessment').addEventListener('click', submitAssessment);
+        document.getElementById('verifyAssessment').addEventListener('click', verifyAssessment);
+        document.getElementById('getQualityReport').addEventListener('click', getQualityReport);
+        document.getElementById('getPropertyHistory').addEventListener('click', getPropertyHistory);
+        document.getElementById('getSystemStats').addEventListener('click', getSystemStats);
+
+        // Input validation
+        document.querySelectorAll('.score-input').forEach(input => {
+            input.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                if (value < 0) this.value = 0;
+                if (value > 100) this.value = 100;
+            });
+        });
+
+        // Initialize
+        updateStatus('Please connect your wallet to begin', 'info');
+
+        // Auto-connect if already connected
+        window.addEventListener('load', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        await connectWallet();
+                    }
+                } catch (error) {
+                    console.log('Auto-connect failed:', error);
+                }
+            }
+        });
+
+        } // End of initializeApp function
+    </script>
+</body>
+</html>

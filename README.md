@@ -42,6 +42,8 @@ The video demonstration includes:
 - [🔧 Technical Implementation](#-technical-implementation)
 - [🧪 Testing](#-testing)
 - [🌐 Live Demo](#-live-demo)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [📂 Project Examples](#-project-examples)
 - [📦 Deployment](#-deployment)
 - [🎓 Documentation](#-documentation)
 - [🛣️ Roadmap](#️-roadmap)
@@ -517,6 +519,61 @@ https://www.alchemy.com/faucets/ethereum-sepolia
 
 ---
 
+## 📂 Project Examples
+
+This repository includes demonstration projects showcasing different implementations:
+
+### AnonymousHousingQualityAssessment
+
+A simplified example demonstrating privacy-preserving housing assessment with minimal dependencies.
+
+**Key Features:**
+- 📦 Lightweight implementation with React 18 + Vite
+- 🔐 FHEVM integration for encrypted quality scores (`euint32`, `euint8`, `ebool`)
+- 🎯 Simplified smart contract architecture
+- ⚡ Fast development server (port 3000)
+- 🎨 13 React components for modular UI
+- 🔧 Custom hooks for wallet and contract management
+
+**Tech Stack:**
+- Frontend: React 18.2.0, TypeScript 5.2.2, Vite 5.0.8
+- Blockchain: Ethers 5.7.2, Viem 2.9.0
+- Styling: Tailwind CSS 3.4.0, Autoprefixer 10.4.16
+- FHE: @fhevm/sdk (workspace)
+- Linting: ESLint 8.55.0, TypeScript-ESLint 6.14.0
+
+**Smart Contract Features:**
+- `euint32` encrypted scores for structural, safety, utility, and location ratings
+- Assessor registration and certification system
+- Quality report generation with encrypted property IDs
+- Event-driven architecture for transparency
+
+**Directory Structure:**
+```
+AnonymousHousingQualityAssessment/
+├── contracts/
+│   └── AnonymousHousingQualityAssessment.sol
+├── src/
+│   ├── components/     (13 React components)
+│   ├── hooks/          (useWallet, useContract)
+│   ├── types/
+│   └── App.tsx
+├── public/
+├── package.json
+└── vite.config.ts
+```
+
+**Getting Started:**
+```bash
+cd AnonymousHousingQualityAssessment
+npm install
+npm run dev  # Starts Vite dev server on port 3000
+```
+
+This example serves as a starting point for developers who want to build privacy-preserving applications with minimal boilerplate code.
+
+---
+
 ## 📊 Performance Metrics
 
 ### Bundle Optimization
@@ -766,6 +823,7 @@ REPORT_GAS=true npx hardhat test
 | [UI_UX_IMPROVEMENTS.md](./UI_UX_IMPROVEMENTS.md) | Design system documentation |
 | [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md) | Technical overview |
 | [CI_CD.md](./CI_CD.md) | CI/CD pipeline documentation |
+| [AnonymousHousingQualityAssessment/](./AnonymousHousingQualityAssessment/) | Simplified example implementation |
 
 ---
 

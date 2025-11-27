@@ -13,7 +13,7 @@
 
 ## 🎥 Video Demo
 
-**📹 Download and Watch Full Demo: [`demo.mp4`]**
+**📹 Download and Watch Full Demo: [`demo.mp4`]** https://streamable.com/bua8m9
 
 The video demonstration includes:
 - ✅ **Project Introduction** - Privacy-preserving housing quality assessment system overview
